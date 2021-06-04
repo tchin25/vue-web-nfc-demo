@@ -1,14 +1,17 @@
 import { ref } from "vue";
 
-enum Status {
+export enum Status {
   IDLE,
   READING,
-  WRITING
+  WRITING,
+  NOT_SUPPORTED,
 }
 
 export default () => {
+  const error = ref<string | null>(null);
   if (!("NDEFReader" in window)) {
-    return { error: "NFC not supported" };
+    error.value = "NFC not supported";
+    return { error, status: Status.NOT_SUPPORTED };
   }
 
   const ndef = new NDEFReader();
@@ -18,6 +21,7 @@ export default () => {
   let readTimeout: number;
 
   const latestRead = ref<NDEFReadingEvent>();
+  const latestWrite = ref();
   const status = ref<Status>(Status.IDLE);
 
   ndef.onreading = (ev) => {
@@ -32,7 +36,7 @@ export default () => {
     }
     status.value = Status.READING;
     readAbort = new AbortController();
-    ndef.scan({ signal: readAbort.signal });
+    ndef.scan({ signal: readAbort.signal }).catch((err) => (error.value = err));
     if (timeout) {
       readTimeout = window.setTimeout(stopReading, timeout);
     }
@@ -60,7 +64,7 @@ export default () => {
       ctrl.abort();
       clearTimeout(writeTimeout);
       status.value = previousStatus;
-    }
+    };
 
     if (timeout) {
       writeTimeout = window.setTimeout(abort, timeout);
@@ -74,7 +78,10 @@ export default () => {
         (event) => {
           ndef
             .write(data, { signal: ctrl.signal })
-            .then(resolve, reject)
+            .then(() => {
+              latestWrite.value = data;
+              resolve;
+            }, reject)
             .finally(() => {
               ignoreRead = false;
             });
@@ -84,9 +91,18 @@ export default () => {
     });
     return {
       promise,
-      abort
+      abort,
     };
   };
 
-  return { ndef, startReading, stopReading, write, latestRead };
+  return {
+    ndef,
+    status,
+    startReading,
+    stopReading,
+    write,
+    latestRead,
+    latestWrite,
+    error,
+  };
 };
