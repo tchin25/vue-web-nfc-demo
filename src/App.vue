@@ -3,14 +3,20 @@
 </template>
 
 <script lang="ts">
+/// <reference path="web-nfc.d.ts" />
+
 import { defineComponent } from "vue";
+import useNFC from "./composition/useNFC";
 
 export default defineComponent({
   name: "App",
   components: {},
+  setup() {
+
+  },
   methods: {
     hasNFC() {
-      return "NDEFReader" in window
+      return "NDEFReader" in window;
     },
   },
 });
