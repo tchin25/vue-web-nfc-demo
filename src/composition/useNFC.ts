@@ -34,7 +34,7 @@ export default () => {
     readAbort = new AbortController();
     ndef.scan({ signal: readAbort.signal });
     if (timeout) {
-      readTimeout = setTimeout(() => stopReading, timeout);
+      readTimeout = window.setTimeout(stopReading, timeout);
     }
   };
 
@@ -61,9 +61,9 @@ export default () => {
       clearTimeout(writeTimeout);
       status.value = previousStatus;
     }
-    
+
     if (timeout) {
-      writeTimeout = setTimeout(abort, timeout);
+      writeTimeout = window.setTimeout(abort, timeout);
     }
 
     let promise = new Promise((resolve, reject) => {
