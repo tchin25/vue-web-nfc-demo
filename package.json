@@ -7,6 +7,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^4.11.2",
     "vue": "^3.0.5",
     "vuestic-ui": "^1.0.0"
   },

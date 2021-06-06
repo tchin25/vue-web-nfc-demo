@@ -3,14 +3,21 @@
     <va-card>
       <va-card-content>
         <div>{{ hasNFC() }}</div>
-        {{ latestRead }}
+        {{ latest }}
         <div v-if="!error">No Error</div>
         <div v-else>{{ error }}</div>
         <div>Status: {{ status }}</div>
-        <div v-if="status !== Status.NOT_SUPPORTED">
+        <div class="gutter--xl my-4" v-if="status !== NFCStatus.NOT_SUPPORTED">
           <va-button @click="startReading()"> Start Reading </va-button>
           <va-button @click="stopReading()"> Stop Reading </va-button>
         </div>
+        <div class="gutter--xl" v-if="status !== NFCStatus.NOT_SUPPORTED">
+          <va-button @click="writeNFC"> Write </va-button>
+          <va-button @click="writeURL"> Write URL </va-button>
+          <va-button @click="writeEmpty"> Write Empty </va-button>
+          <va-button @click="abortWrite"> Abort Write </va-button>
+        </div>
+        <div>{{ latestWrite }}</div>
       </va-card-content>
     </va-card>
   </div>
@@ -19,8 +26,8 @@
 <script lang="ts">
 /// <reference path="web-nfc.d.ts" />
 
-import { defineComponent } from "vue";
-import useNFC, { Status } from "./composition/useNFC";
+import { defineComponent, ref, computed } from "vue";
+import useNFC, { NFCStatus } from "./composition/useNFC";
 
 export default defineComponent({
   name: "App",
@@ -30,9 +37,50 @@ export default defineComponent({
       return "NDEFReader" in window;
     };
 
-    const nfc = useNFC();
+    const { write, ...nfc } = useNFC();
 
-    return { hasNFC, ...nfc };
+    const writeNFC = () => {
+      write({
+        records: [{ recordType: "text", data: "Hello World" }],
+      }).catch((e) => {
+        console.log(e);
+      });
+    };
+
+    const writeURL = () => {
+      write({
+        records: [
+          { recordType: "url", data: "https://w3c.github.io/web-nfc/" },
+        ],
+      }).catch((e) => {
+        console.log(e);
+      });
+    };
+
+    const writeEmpty = () => {
+      write({
+        records: [{ recordType: "empty" }],
+      }).catch((e) => {
+        console.log(e);
+      });
+    };
+
+    const latest = computed(() => {
+      return nfc.latestRead?.value
+        ? nfc.latestRead.value.message.records[0].recordType
+        : "No message";
+    });
+
+    return {
+      hasNFC,
+      NFCStatus,
+      writeNFC,
+      writeURL,
+      writeEmpty,
+      latest,
+      write,
+      ...nfc,
+    };
   },
 });
 </script>
