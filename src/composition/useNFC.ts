@@ -10,13 +10,13 @@ export enum NFCStatus {
 
 export default () => {
   const error = ref<string | null>(null);
+
+  const _status = ref<NFCStatus[]>(new Array(4));
   const status = computed<NFCStatus>(() => {
     return _status.value.reduce((prev, curr) => {
       return prev > curr ? prev : curr;
     });
   });
-
-  const _status = ref<NFCStatus[]>(new Array(4));
 
   const _setStatus = (nfcStatus: NFCStatus, value: boolean) => {
     _status.value[nfcStatus] = value ? nfcStatus : -1;
@@ -29,7 +29,7 @@ export default () => {
     _setStatus(NFCStatus.NOT_SUPPORTED, true);
   }
 
-  const _ndef = new NDEFReader();
+  const ndef = new NDEFReader();
   let _ignoreRead = false;
 
   let _readAbort = new AbortController();
@@ -40,11 +40,11 @@ export default () => {
   let _writeTimeout: number;
   const latestWrite = ref();
 
-  _ndef.onreading = (ev) => {
+  ndef.addEventListener("reading", (ev) => {
     if (!_ignoreRead) {
-      latestRead.value = ev;
+      latestRead.value = ev as NDEFReadingEvent;
     }
-  };
+  });
 
   const startReading = (timeout?: number) => {
     if (_status.value[NFCStatus.READING] === NFCStatus.READING) {
@@ -56,7 +56,7 @@ export default () => {
       _readTimeout = window.setTimeout(stopReading, timeout);
     }
 
-    return _ndef
+    return ndef
       .scan({ signal: _readAbort.signal })
       .catch((err) => (error.value = err));
   };
@@ -83,7 +83,7 @@ export default () => {
 
     return new Promise((resolve, reject) => {
       _writeAbort.signal.onabort = reject;
-      _ndef
+      ndef
         .write(data, { signal: _writeAbort.signal })
         .then(() => {
           latestWrite.value = data;
@@ -110,7 +110,7 @@ export default () => {
   });
 
   return {
-    ndef: _ndef,
+    ndef,
     status,
     startReading,
     stopReading,
