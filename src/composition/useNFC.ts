@@ -20,7 +20,7 @@ export default () => {
 
   const _setStatus = (nfcStatus: NFCStatus, value: boolean) => {
     _status.value[nfcStatus] = value ? nfcStatus : -1;
-  }
+  };
 
   _setStatus(NFCStatus.IDLE, true);
 
@@ -48,7 +48,7 @@ export default () => {
 
   const startReading = (timeout?: number) => {
     if (_status.value[NFCStatus.READING] === NFCStatus.READING) {
-      throw new Error("Already reading NFC");
+      stopReading();
     }
     _readAbort = new AbortController();
     _setStatus(NFCStatus.READING, true);
@@ -63,7 +63,6 @@ export default () => {
 
   const stopReading = () => {
     _readAbort.abort();
-    _readAbort = new AbortController();
     clearTimeout(_readTimeout);
     _setStatus(NFCStatus.READING, false);
   };
@@ -71,7 +70,7 @@ export default () => {
   // TODO: Prevent native read immediately after write
   const write = (data: any, timeout?: number): Promise<unknown> => {
     if (_status.value[NFCStatus.WRITING] === NFCStatus.WRITING) {
-      throw new Error("Already writing NFC");
+      abortWrite();
     }
 
     _writeAbort = new AbortController();
@@ -100,7 +99,6 @@ export default () => {
 
   const abortWrite = () => {
     _writeAbort.abort();
-    _writeAbort = new AbortController();
     clearTimeout(_writeTimeout);
     _ignoreRead = false;
     _setStatus(NFCStatus.WRITING, false);
