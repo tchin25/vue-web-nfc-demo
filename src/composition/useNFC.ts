@@ -11,15 +11,24 @@ export enum NFCStatus {
 export default () => {
   const error = ref<string | null>(null);
 
-  const _status = ref<NFCStatus[]>(new Array(4));
+  const _status = ref<Array<NFCStatus|null>>(new Array(4));
+
+  /**
+   * Returns the highest priority status
+   * WRITING > READING > IDLE > NOT_SUPPORTED
+   */
   const status = computed<NFCStatus>(() => {
     return _status.value.reduce((prev, curr) => {
+      prev ??= -1;
+      curr ??= -1;
       return prev > curr ? prev : curr;
-    });
+    }) || 0;
   });
 
+  const is = (nfcStatus: NFCStatus) => _status.value[nfcStatus] ? true : false;
+
   const _setStatus = (nfcStatus: NFCStatus, value: boolean) => {
-    _status.value[nfcStatus] = value ? nfcStatus : -1;
+    _status.value[nfcStatus] = value ? nfcStatus : null;
   };
 
   _setStatus(NFCStatus.IDLE, true);
@@ -112,6 +121,7 @@ export default () => {
   return {
     ndef,
     status,
+    is,
     startReading,
     stopReading,
     write,
