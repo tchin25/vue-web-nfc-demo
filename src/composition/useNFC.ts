@@ -1,4 +1,4 @@
-import { ref, computed } from "vue";
+import { ref, computed, InjectionKey, ComputedRef, Ref } from "vue";
 import { tryOnUnmounted } from "@vueuse/shared";
 
 export enum NFCStatus {
@@ -8,7 +8,22 @@ export enum NFCStatus {
   NOT_SUPPORTED,
 }
 
-export default () => {
+export interface NFCInterface{
+    ndef: NDEFReader,
+    status: ComputedRef<NFCStatus>,
+    is: (nfcStatus: NFCStatus) => boolean,
+    startReading: (timeout?: number) => Promise<any>,
+    stopReading: () => void,
+    write: (date: any, timeout?: number ) => Promise<unknown>,
+    abortWrite: () => void,
+    latestRead: Ref<NDEFReadingEvent | undefined>,
+    latestWrite: Ref<any>,
+    error: Ref<string | null>,
+};
+
+export const NFCInjectionKey: InjectionKey<NFCInterface> = Symbol();
+
+export default (): NFCInterface => {
   const error = ref<string | null>(null);
 
   const _status = ref<Array<NFCStatus|null>>(new Array(4));
