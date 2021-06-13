@@ -8,39 +8,42 @@ export enum NFCStatus {
   NOT_SUPPORTED,
 }
 
-export interface NFCInterface{
-    ndef: NDEFReader,
-    status: ComputedRef<NFCStatus>,
-    is: (nfcStatus: NFCStatus) => boolean,
-    startReading: (timeout?: number) => Promise<any>,
-    stopReading: () => void,
-    write: (date: any, timeout?: number ) => Promise<unknown>,
-    abortWrite: () => void,
-    latestRead: Ref<NDEFReadingEvent | undefined>,
-    latestWrite: Ref<any>,
-    error: Ref<string | null>,
-};
+export interface NFCInterface {
+  ndef: NDEFReader;
+  status: ComputedRef<NFCStatus>;
+  is: (nfcStatus: NFCStatus) => boolean;
+  startReading: (timeout?: number) => Promise<any>;
+  stopReading: () => void;
+  write: (date: any, timeout?: number) => Promise<unknown>;
+  abortWrite: () => void;
+  latestRead: Ref<NDEFReadingEvent | undefined>;
+  latestWrite: Ref<any>;
+  error: Ref<string | null>;
+}
 
 export const NFCInjectionKey: InjectionKey<NFCInterface> = Symbol();
 
 export default (): NFCInterface => {
   const error = ref<string | null>(null);
 
-  const _status = ref<Array<NFCStatus|null>>(new Array(4));
+  const _status = ref<Array<NFCStatus | null>>(new Array(4));
 
   /**
    * Returns the highest priority status
    * WRITING > READING > IDLE > NOT_SUPPORTED
    */
   const status = computed<NFCStatus>(() => {
-    return _status.value.reduce((prev, curr) => {
-      prev ??= -1;
-      curr ??= -1;
-      return prev > curr ? prev : curr;
-    }) || 0;
+    return (
+      _status.value.reduce((prev, curr) => {
+        prev ??= -1;
+        curr ??= -1;
+        return prev > curr ? prev : curr;
+      }) || 0
+    );
   });
 
-  const is = (nfcStatus: NFCStatus) => _status.value[nfcStatus] ? true : false;
+  const is = (nfcStatus: NFCStatus) =>
+    _status.value[nfcStatus] ? true : false;
 
   const _setStatus = (nfcStatus: NFCStatus, value: boolean) => {
     _status.value[nfcStatus] = value ? nfcStatus : null;
