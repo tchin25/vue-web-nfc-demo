@@ -1,5 +1,6 @@
 import { ref, computed, InjectionKey, ComputedRef, Ref } from "vue";
 import { tryOnUnmounted } from "@vueuse/shared";
+import { useRefHistory, UseRefHistoryReturn } from "@vueuse/core";
 
 export enum NFCStatus {
   IDLE,
@@ -11,6 +12,7 @@ export enum NFCStatus {
 export interface NFCInterface {
   ndef: NDEFReader;
   status: ComputedRef<NFCStatus>;
+  statusHistory: UseRefHistoryReturn<NFCStatus, NFCStatus>;
   is: (nfcStatus: NFCStatus) => boolean;
   startReading: (timeout?: number) => Promise<any>;
   stopReading: () => void;
@@ -19,10 +21,14 @@ export interface NFCInterface {
   latestRead: Ref<NDEFReadingEvent | undefined>;
   latestWrite: Ref<any>;
   error: Ref<string | null>;
+  // For testing purposes
+  debug: {
+    _status: Ref<Array<NFCStatus | null>>;
+    _setStatus: (nfcStatus: NFCStatus, value: boolean) => void;
+  };
 }
 
 export const NFCInjectionKey: InjectionKey<NFCInterface> = Symbol();
-
 
 export default (_ndef?: NDEFReader): NFCInterface => {
   const error = ref<string | null>(null);
@@ -31,21 +37,19 @@ export default (_ndef?: NDEFReader): NFCInterface => {
 
   /**
    * Returns the highest priority status
-   * WRITING > READING > IDLE > NOT_SUPPORTED
+   * NOT_SUPPORTED > WRITING > READING > IDLE
    */
-  const status = computed<NFCStatus>(() => {
+   const status = computed<NFCStatus>(() => {
     return (
       _status.value.reduce((prev, curr) => {
-        prev = prev ? prev : -1;
-        curr = curr ? curr : -1;
+        prev = prev ? prev : 0;
+        curr = curr ? curr : 0;
         return prev > curr ? prev : curr;
-      }) || 0
+      }, NFCStatus.IDLE) || NFCStatus.IDLE
     );
   });
 
-  const is = (nfcStatus: NFCStatus) =>
-    _status.value[nfcStatus] ? true : false;
-    
+  const statusHistory = useRefHistory(status);
   const _setStatus = (nfcStatus: NFCStatus, value: boolean) => {
     _status.value[nfcStatus] = value ? nfcStatus : null;
   };
@@ -56,6 +60,9 @@ export default (_ndef?: NDEFReader): NFCInterface => {
     error.value = "NFC not supported";
     _setStatus(NFCStatus.NOT_SUPPORTED, true);
   }
+
+  const is = (nfcStatus: NFCStatus) =>
+    _status.value[nfcStatus] ? true : false;
 
   const ndef = _ndef ? _ndef : new NDEFReader();
   let _ignoreRead = false;
@@ -140,6 +147,7 @@ export default (_ndef?: NDEFReader): NFCInterface => {
   return {
     ndef,
     status,
+    statusHistory,
     is,
     startReading,
     stopReading,
@@ -148,5 +156,9 @@ export default (_ndef?: NDEFReader): NFCInterface => {
     latestRead,
     latestWrite,
     error,
+    debug: {
+      _status,
+      _setStatus,
+    },
   };
 };
