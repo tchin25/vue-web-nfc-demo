@@ -23,7 +23,8 @@ export interface NFCInterface {
 
 export const NFCInjectionKey: InjectionKey<NFCInterface> = Symbol();
 
-export default (): NFCInterface => {
+
+export default (_ndef?: NDEFReader): NFCInterface => {
   const error = ref<string | null>(null);
 
   const _status = ref<Array<NFCStatus | null>>(new Array(4));
@@ -35,8 +36,8 @@ export default (): NFCInterface => {
   const status = computed<NFCStatus>(() => {
     return (
       _status.value.reduce((prev, curr) => {
-        prev ??= -1;
-        curr ??= -1;
+        prev = prev ? prev : -1;
+        curr = curr ? curr : -1;
         return prev > curr ? prev : curr;
       }) || 0
     );
@@ -44,7 +45,7 @@ export default (): NFCInterface => {
 
   const is = (nfcStatus: NFCStatus) =>
     _status.value[nfcStatus] ? true : false;
-
+    
   const _setStatus = (nfcStatus: NFCStatus, value: boolean) => {
     _status.value[nfcStatus] = value ? nfcStatus : null;
   };
@@ -56,7 +57,7 @@ export default (): NFCInterface => {
     _setStatus(NFCStatus.NOT_SUPPORTED, true);
   }
 
-  const ndef = new NDEFReader();
+  const ndef = _ndef ? _ndef : new NDEFReader();
   let _ignoreRead = false;
 
   let _readAbort = new AbortController();
