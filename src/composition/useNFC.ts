@@ -42,8 +42,8 @@ export default (_ndef?: NDEFReader): NFCInterface => {
    const status = computed<NFCStatus>(() => {
     return (
       _status.value.reduce((prev, curr) => {
-        prev = prev ? prev : 0;
-        curr = curr ? curr : 0;
+        prev = prev ? prev : NFCStatus.IDLE;
+        curr = curr ? curr : NFCStatus.IDLE;
         return prev > curr ? prev : curr;
       }, NFCStatus.IDLE) || NFCStatus.IDLE
     );
@@ -61,6 +61,7 @@ export default (_ndef?: NDEFReader): NFCInterface => {
     _setStatus(NFCStatus.NOT_SUPPORTED, true);
   }
 
+  // Should probably be computed
   const is = (nfcStatus: NFCStatus) =>
     _status.value[nfcStatus] ? true : false;
 
@@ -103,6 +104,7 @@ export default (_ndef?: NDEFReader): NFCInterface => {
   };
 
   // TODO: Prevent native read immediately after write
+  // Not sure if this is possible considering we're restricted to browser
   const write = (data: any, timeout?: number): Promise<unknown> => {
     if (_status.value[NFCStatus.WRITING] === NFCStatus.WRITING) {
       abortWrite();

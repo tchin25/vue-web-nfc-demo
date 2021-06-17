@@ -7,63 +7,31 @@
         <div v-if="!error">No Error</div>
         <div v-else>{{ error }}</div>
         <div>Status: {{ status }}</div>
-        <div class="gutter--xl my-4" v-if="status !== NFCStatus.NOT_SUPPORTED">
-          <va-button @click="startReading()"> Start Reading </va-button>
-          <va-button @click="stopReading()"> Stop Reading </va-button>
-        </div>
-        <div class="gutter--xl" v-if="status !== NFCStatus.NOT_SUPPORTED">
-          <va-button @click="writeNFC"> Write </va-button>
-          <va-button @click="writeURL"> Write URL </va-button>
-          <va-button @click="writeEmpty"> Write Empty </va-button>
-          <va-button @click="abortWrite"> Abort Write </va-button>
-        </div>
-        <div>{{ latestWrite }}</div>
       </va-card-content>
     </va-card>
+
+    <ReadNFC v-if="!is(NFCStatus.NOT_SUPPORTED)" />
+    <WriteNFC v-if="!is(NFCStatus.NOT_SUPPORTED)" />
   </div>
 </template>
 
 <script lang="ts">
 /// <reference path="web-nfc.d.ts" />
-
-import { defineComponent, ref, computed } from "vue";
-import useNFC, { NFCStatus } from "./composition/useNFC";
+import { defineComponent, provide, computed } from "vue";
+import useNFC, { NFCStatus, NFCInjectionKey } from "./composition/useNFC";
+import WriteNFC from "./components/WriteNFC.vue";
+import ReadNFC from "./components/ReadNFC.vue";
 
 export default defineComponent({
   name: "App",
-  components: {},
+  components: { WriteNFC, ReadNFC },
   setup() {
     const hasNFC = () => {
       return "NDEFReader" in window;
     };
 
-    const { write, ...nfc } = useNFC();
-
-    const writeNFC = () => {
-      write({
-        records: [{ recordType: "text", data: "Hello World" }],
-      }).catch((e) => {
-        console.log(e);
-      });
-    };
-
-    const writeURL = () => {
-      write({
-        records: [
-          { recordType: "url", data: "https://w3c.github.io/web-nfc/" },
-        ],
-      }).catch((e) => {
-        console.log(e);
-      });
-    };
-
-    const writeEmpty = () => {
-      write({
-        records: [{ recordType: "empty" }],
-      }).catch((e) => {
-        console.log(e);
-      });
-    };
+    const nfc = useNFC();
+    provide(NFCInjectionKey, nfc);
 
     const latest = computed(() => {
       return nfc.latestRead?.value
@@ -74,11 +42,7 @@ export default defineComponent({
     return {
       hasNFC,
       NFCStatus,
-      writeNFC,
-      writeURL,
-      writeEmpty,
       latest,
-      write,
       ...nfc,
     };
   },
