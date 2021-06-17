@@ -9,9 +9,10 @@
         <div>Status: {{ status }}</div>
       </va-card-content>
     </va-card>
-
-    <ReadNFC v-if="!is(NFCStatus.NOT_SUPPORTED)" />
-    <WriteNFC v-if="!is(NFCStatus.NOT_SUPPORTED)" />
+    <template v-if="hasNFC()">
+      <ReadNFC />
+      <WriteNFC />
+    </template>
   </div>
 </template>
 

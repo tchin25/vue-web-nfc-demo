@@ -112,6 +112,8 @@ export default (_ndef?: NDEFReader): NFCInterface => {
 
     _writeAbort = new AbortController();
     _setStatus(NFCStatus.WRITING, true);
+
+    // A call to write automatically calls a read so we ignore that read here
     _ignoreRead = true;
 
     if (timeout) {
