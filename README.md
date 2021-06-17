@@ -1,27 +1,25 @@
-# Vue 3 + Typescript + Vite
+# NFC Example Using Vue 3
 
-This template should help get you started developing with Vue 3 and Typescript in Vite.
+This is an example project showing off Chrome's new NFC capabilities.
 
-## Recommended IDE Setup
+### Device Requirements
+NFC only works on ***Chrome 89 and above*** on ***Android phones with NFC***. The code detects whether the browser supports NFC, but not if your phone has NFC capabilities.
 
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
+I tested this code with NTAG215 cards but any standard card that supported NDEF should work.
 
-### If Using `<script setup>`
+Additional reading of the WebNFC standard can be found [here](https://w3c.github.io/web-nfc/).
 
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
+### How To Debug
 
-## Type Support For `.vue` Imports in TS
+Because the code ***only*** works on phones, follow [these steps](https://developer.chrome.com/docs/devtools/remote-debugging/) to get set up with remote debugging on Android.
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
-
-### If Using Volar
-
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
-
-### If Using Vetur
-
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette
-5. Search and run "Select TypeScript version" -> "Use workspace version"
+### Project Setup
+Install Dependencies
+```
+yarn
+```
+Run Local Server
+```
+yarn dev
+```
+Then connect to the server IP on your phone. HTTPS must be enabled for NFC to work.
