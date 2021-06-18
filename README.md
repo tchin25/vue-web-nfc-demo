@@ -1,4 +1,4 @@
-# NFC Example Using Vue 3
+# Web NFC Example Using Vue 3
 
 This is an example project showing off Chrome's new NFC capabilities.
 
