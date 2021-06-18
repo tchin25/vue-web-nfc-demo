@@ -1,14 +1,12 @@
 <template>
   <va-card>
     <va-card-content>
-      <div class="gutter--xl">
-        <va-button @click="startReading()" v-if="!is(NFCStatus.READING)">
-          Start Reading
-        </va-button>
-        <va-button color="danger" @click="stopReading()" v-else>
-          Stop Reading
-        </va-button>
-      </div>
+      <va-button @click="startReading()" v-if="!is(NFCStatus.READING)">
+        Start Reading
+      </va-button>
+      <va-button color="danger" @click="stopReading()" v-else>
+        Stop Reading
+      </va-button>
     </va-card-content>
   </va-card>
 </template>

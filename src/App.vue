@@ -1,11 +1,10 @@
 <template>
-  <div class="layout gutter--xl">
+  <div class="layout">
     <va-card>
       <va-card-content>
-        <div>{{ hasNFC() }}</div>
-        {{ latest }}
-        <div v-if="!error">No Error</div>
-        <div v-else>{{ error }}</div>
+        <div>Has NFC: {{ hasNFC() }}</div>
+        <div>Latest Read: {{ latest }}</div>
+        <div>Error: {{ error || `No error` }}</div>
         <div>Status: {{ status }}</div>
       </va-card-content>
     </va-card>
@@ -37,7 +36,7 @@ export default defineComponent({
     const latest = computed(() => {
       return nfc.latestRead?.value
         ? nfc.latestRead.value.message.records[0].recordType
-        : "No message";
+        : "N/A";
     });
 
     return {
@@ -58,5 +57,9 @@ export default defineComponent({
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.va-card {
+  margin: 1rem;
 }
 </style>

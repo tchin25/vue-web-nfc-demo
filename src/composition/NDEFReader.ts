@@ -1,5 +1,5 @@
 /**
- * This is to shim the NDEFReader class on the windows object on incompatible devies so that the web app doesn't completely crash when you visit on a computer.
+ * This is to shim the NDEFReader class on the windows object on incompatible devices so that the web app doesn't completely crash when you visit on a computer.
  */
 
 let _NDEFReader = class __NDEFReader extends EventTarget {
@@ -13,6 +13,9 @@ let _NDEFReader = class __NDEFReader extends EventTarget {
     new Promise<void>(() => {});
 };
 
+/**
+ * If we're in testing, mock the NDEFReader class
+ */
 // @ts-ignore
 if (process.env.NODE_ENV === "test") {
   // @ts-ignore

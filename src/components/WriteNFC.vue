@@ -1,13 +1,11 @@
 <template>
   <va-card>
     <va-card-content>
-      <div class="gutter--xl">
-        <va-button @click="writeNFC"> Write </va-button>
-        <va-button @click="writeURL"> Write URL </va-button>
-        <va-button @click="writeEmpty"> Write Empty </va-button>
-        <va-button @click="abortWrite"> Abort Write </va-button>
-      </div>
-      <div>{{ latestWrite }}</div>
+      <va-button class="ma-1" @click="writeNFC"> Write Text </va-button>
+      <va-button class="ma-1" @click="writeURL"> Write URL </va-button>
+      <va-button class="ma-1" @click="writeEmpty"> Write Empty </va-button>
+      <va-button class="ma-1" @click="abortWrite"> Abort Write </va-button>
+      <div>Latest Write: {{ latestWrite || `N/A` }}</div>
     </va-card-content>
   </va-card>
 </template>
@@ -53,7 +51,7 @@ export default defineComponent({
       writeURL,
       writeEmpty,
       latestWrite,
-      abortWrite
+      abortWrite,
     };
   },
 });
