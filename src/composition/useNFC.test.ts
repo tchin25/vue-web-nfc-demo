@@ -4,19 +4,6 @@
 
 import useNFC, { NFCStatus } from "./useNFC";
 import { mocked } from "ts-jest/utils";
-import { useRefHistory } from "@vueuse/core";
-import { computed, nextTick, ref } from "vue";
-
-// @ts-ignore
-window.NDEFReader = jest.fn().mockImplementation(() => ({
-  onreading: jest.fn(),
-  onreadingerror: jest.fn(),
-  scan: jest.fn().mockResolvedValue(1),
-  write: jest.fn().mockResolvedValue(1),
-  addEventListener: jest.fn(),
-  dispatchEvent: jest.fn(),
-  removeEventListener: jest.fn(),
-}));
 
 describe("NDEFReader is mocked on global object", () => {
   it("Can create a new NDEFReader object", () => {
@@ -29,8 +16,8 @@ describe("NDEFReader is mocked on global object", () => {
 });
 
 describe("useNFC", () => {
-  let ndef = mocked(new NDEFReader());
-  let nfc = useNFC(ndef);
+  let {ndef: _ndef, ...nfc} = useNFC();
+  let ndef = mocked(_ndef);
   it("Computes the correct status", () => {
     const { _setStatus } = nfc.debug;
     expect(nfc.status.value).toBe(NFCStatus.IDLE);
