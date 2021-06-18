@@ -1,4 +1,4 @@
-import { ref, computed, InjectionKey, ComputedRef, Ref } from "vue";
+import { ref, computed, ComputedRef, Ref } from "vue";
 import { useRefHistory, UseRefHistoryReturn } from "@vueuse/core";
 
 import { _NDEFReader as NDEFReader } from "./NDEFReader";
@@ -29,8 +29,6 @@ export interface NFCInterface {
     _statusHistory: UseRefHistoryReturn<NFCStatus, NFCStatus>;
   };
 }
-
-export const NFCInjectionKey: InjectionKey<NFCInterface> = Symbol();
 
 const error = ref<string | null>(null);
 const _status = ref<Array<NFCStatus | null>>(new Array(4));

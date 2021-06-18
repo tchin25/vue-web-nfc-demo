@@ -10,15 +10,12 @@
   </va-card>
 </template>
 <script lang="ts">
-import { defineComponent, inject } from "vue";
-import useNFC, { NFCInjectionKey } from "../composition/useNFC";
+import { defineComponent } from "vue";
+import useNFC from "../composition/useNFC";
 
 export default defineComponent({
   setup() {
-    const { write, latestWrite, abortWrite } = inject(
-      NFCInjectionKey,
-      useNFC()
-    );
+    const { write, latestWrite, abortWrite } = useNFC();
 
     const writeNFC = () => {
       write({

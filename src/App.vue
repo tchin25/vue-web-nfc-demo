@@ -17,8 +17,8 @@
 
 <script lang="ts">
 /// <reference path="web-nfc.d.ts" />
-import { defineComponent, provide, computed } from "vue";
-import useNFC, { NFCStatus, NFCInjectionKey } from "./composition/useNFC";
+import { defineComponent, computed } from "vue";
+import useNFC, { NFCStatus } from "./composition/useNFC";
 import WriteNFC from "./components/WriteNFC.vue";
 import ReadNFC from "./components/ReadNFC.vue";
 
@@ -31,7 +31,6 @@ export default defineComponent({
     };
 
     const nfc = useNFC();
-    provide(NFCInjectionKey, nfc);
 
     const latest = computed(() => {
       return nfc.latestRead?.value
